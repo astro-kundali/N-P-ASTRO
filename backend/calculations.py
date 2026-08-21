@@ -276,8 +276,10 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
     
     # 12 Placidus Cusps
     cusps_data = []
+    # In pyswisseph, houses_ex returns a 13-element array for cusps (index 0 is dummy, 1-12 are cusps 1-12)
+    actual_cusps = cusps[1:] if len(cusps) == 13 else cusps
     for i in range(12):
-        sidereal_cusp = cusps[i]  # 0-indexed in pyswisseph (representing houses 1 to 12)
+        sidereal_cusp = actual_cusps[i]
         lords = calculate_lords_hierarchy(sidereal_cusp)
         lords["cusp_number"] = i + 1
         cusps_data.append(lords)
@@ -380,33 +382,44 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
                     break
             planet_roles[p_name] = [placed_house]
             
-    # Cuspal Significators Table
-    # 12 cusps:
-    # row 1: Sub Lord of the sign lord (ruler) of the cusp
-    # row 2: Star Lord of the sign lord (ruler) of the cusp (if ruler is Moon, Star Lord becomes dasha_lord!)
-    # row 3: Sub Lord of the cusp itself
+    # Cuspal Significators Table (matching the Brihaspathi Gurukulam App)
     cuspal_significators = []
     for idx, cusp in enumerate(cusps_data):
-        sign_lord = cusp["sign_lord"]
+        cusp_sub_lord = cusp["sub_lord"]
         
-        # Row 1 value
-        row1_val = planets_data.get(sign_lord, {}).get("sub_lord", "")
-        
-        # Row 2 value
-        if sign_lord == "Moon":
-            row2_val = dasha_lord
+        # Star Lord (overridden for Moon to be the active dasha_lord)
+        if cusp_sub_lord == "Moon":
+            star_lord = dasha_lord
         else:
-            row2_val = planets_data.get(sign_lord, {}).get("star_lord", "")
+            star_lord = planets_data.get(cusp_sub_lord, {}).get("star_lord", "")
             
-        # Row 3 value
-        row3_val = cusp["sub_lord"]
+        sub_lord = planets_data.get(cusp_sub_lord, {}).get("sub_lord", "")
         
+        # Get combinations
+        c_sub_lord_roles = planet_roles.get(cusp_sub_lord, [])
+        star_lord_roles = planet_roles.get(star_lord, [])
+        sub_lord_roles = planet_roles.get(sub_lord, [])
+        
+        # Calculate Effective Links
+        # Keep only odd houses for positive significators, even for obstacle planets (Moon/Mars)
+        if cusp_sub_lord in ["Jupiter", "Sun", "Venus", "Rahu", "Ketu"]:
+            eff_links = [h for h in c_sub_lord_roles if h % 2 != 0]
+        elif cusp_sub_lord in ["Mercury", "Saturn"]:
+            union_set = set(star_lord_roles) | set(sub_lord_roles)
+            eff_links = [h for h in union_set if h % 2 != 0]
+        else: # Moon, Mars
+            union_set = set(c_sub_lord_roles) | set(star_lord_roles)
+            eff_links = [h for h in union_set if h % 2 == 0]
+            
         cuspal_significators.append({
             "cusp_number": idx + 1,
-            "sign_lord": sign_lord,
-            "row1_sub_lord_of_sign_lord": row1_val,
-            "row2_star_lord_of_sign_lord": row2_val,
-            "row3_sub_lord_of_cusp": row3_val
+            "cusp_sub_lord": cusp_sub_lord,
+            "cusp_sub_lord_roles": c_sub_lord_roles,
+            "star_lord": star_lord,
+            "star_lord_roles": star_lord_roles,
+            "sub_lord": sub_lord,
+            "sub_lord_roles": sub_lord_roles,
+            "effective_links": sorted(list(set(eff_links)))
         })
         
     # Clean up swisseph files/cache
