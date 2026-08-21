@@ -369,6 +369,17 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
         if c_sub_lord in planet_roles:
             planet_roles[c_sub_lord].append(idx + 1)
             
+    # Fallback: if a planet is not the sub-lord of any cusp,
+    # use the KP house number in which that planet is placed.
+    for p_name in VIMSHOTTARI_LORDS:
+        if not planet_roles[p_name]:
+            placed_house = 1
+            for house_num, house_data in kp_houses.items():
+                if p_name in house_data["planets"]:
+                    placed_house = house_num
+                    break
+            planet_roles[p_name] = [placed_house]
+            
     # Cuspal Significators Table
     # 12 cusps:
     # row 1: Sub Lord of the sign lord (ruler) of the cusp
