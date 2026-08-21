@@ -128,5 +128,5 @@ def get_chart_data(req: ChartRequest):
         }
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Astrological calculation failure: {str(e)}")
+        tb_str = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=f"Astrological calculation failure: {str(e)}\nTraceback:\n{tb_str}")
