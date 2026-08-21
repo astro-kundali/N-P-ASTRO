@@ -372,15 +372,24 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
             planet_roles[c_sub_lord].append(idx + 1)
             
     # Fallback: if a planet is not the sub-lord of any cusp,
-    # use the KP house number in which that planet is placed.
+    # check if it is the star-lord of any cusp.
+    # If not in star-lord either, use the KP house number in which that planet is placed.
     for p_name in VIMSHOTTARI_LORDS:
         if not planet_roles[p_name]:
-            placed_house = 1
-            for house_num, house_data in kp_houses.items():
-                if p_name in house_data["planets"]:
-                    placed_house = house_num
-                    break
-            planet_roles[p_name] = [placed_house]
+            star_cusps = []
+            for idx, cusp in enumerate(cusps_data):
+                if cusp["star_lord"] == p_name:
+                    star_cusps.append(idx + 1)
+            
+            if star_cusps:
+                planet_roles[p_name] = star_cusps
+            else:
+                placed_house = 1
+                for house_num, house_data in kp_houses.items():
+                    if p_name in house_data["planets"]:
+                        placed_house = house_num
+                        break
+                planet_roles[p_name] = [placed_house]
             
     # Cuspal Significators Table (matching the Brihaspathi Gurukulam App)
     cuspal_significators = []
