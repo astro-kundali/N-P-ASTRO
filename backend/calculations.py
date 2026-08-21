@@ -230,7 +230,7 @@ def calculate_kundali_data(utc_dt, lat, lon):
         "Jupiter": swe.JUPITER,
         "Venus": swe.VENUS,
         "Saturn": swe.SATURN,
-        "Rahu": swe.TRUE_NODE  # KP and Vedic use True Node
+        "Rahu": swe.MEAN_NODE  # KP and Vedic use Mean Node by default
     }
     
     planets_data = {}
@@ -259,7 +259,7 @@ def calculate_kundali_data(utc_dt, lat, lon):
     
     # 3. Calculate Placidus Houses (KP Cusps)
     # Placidus system is 'P', passing FLG_SIDEREAL calculates sidereal directly
-    cusps, ascmc = swe.houses_ex(jd_ut, lat, lon, b'P', swe.FLG_SIDEREAL)
+    cusps, ascmc = swe.houses_ex(jd_ut, lat, lon, b'P', swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
     
     # Ascendant
     asc_sidereal = ascmc[0]
