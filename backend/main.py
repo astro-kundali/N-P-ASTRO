@@ -95,6 +95,7 @@ def get_chart_data(req: ChartRequest):
     Computes Vedic Kundali, KP Cusps, planetary tables, and Vimshottari Dashas
     from input birth details.
     """
+    # Trigger rebuild version 1.12
     try:
         # 1. Parse date and time in local timezone
         try:
