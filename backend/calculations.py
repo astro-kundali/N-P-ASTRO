@@ -344,6 +344,60 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
     moon_long = planets_data["Moon"]["longitude"]
     dasha_timeline = calculate_vimshottari_dasha(moon_long, utc_dt)
     
+    # 5b. NP Astrology Calculations
+    # Find currently running Mahadasha Lord
+    now_utc_aware = datetime.datetime.now(datetime.timezone.utc)
+    dasha_lord = VIMSHOTTARI_LORDS[0] # Default fallback
+    for md in dasha_timeline:
+        try:
+            start_dt = datetime.datetime.fromisoformat(md["start"])
+            end_dt = datetime.datetime.fromisoformat(md["end"])
+            if start_dt <= now_utc_aware <= end_dt:
+                dasha_lord = md["lord"]
+                break
+        except Exception:
+            continue
+            
+    # Planet Roles Table
+    # For every planet, collect list of cusp numbers where this planet is the Sub Lord
+    planet_roles = {}
+    for p_name in VIMSHOTTARI_LORDS:
+        planet_roles[p_name] = []
+        
+    for idx, cusp in enumerate(cusps_data):
+        c_sub_lord = cusp["sub_lord"]
+        if c_sub_lord in planet_roles:
+            planet_roles[c_sub_lord].append(idx + 1)
+            
+    # Cuspal Significators Table
+    # 12 cusps:
+    # row 1: Sub Lord of the sign lord (ruler) of the cusp
+    # row 2: Star Lord of the sign lord (ruler) of the cusp (if ruler is Moon, Star Lord becomes dasha_lord!)
+    # row 3: Sub Lord of the cusp itself
+    cuspal_significators = []
+    for idx, cusp in enumerate(cusps_data):
+        sign_lord = cusp["sign_lord"]
+        
+        # Row 1 value
+        row1_val = planets_data.get(sign_lord, {}).get("sub_lord", "")
+        
+        # Row 2 value
+        if sign_lord == "Moon":
+            row2_val = dasha_lord
+        else:
+            row2_val = planets_data.get(sign_lord, {}).get("star_lord", "")
+            
+        # Row 3 value
+        row3_val = cusp["sub_lord"]
+        
+        cuspal_significators.append({
+            "cusp_number": idx + 1,
+            "sign_lord": sign_lord,
+            "row1_sub_lord_of_sign_lord": row1_val,
+            "row2_star_lord_of_sign_lord": row2_val,
+            "row3_sub_lord_of_cusp": row3_val
+        })
+        
     # Clean up swisseph files/cache
     swe.close()
     
@@ -355,5 +409,10 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
         "cusps": cusps_data,
         "vedic_houses": vedic_houses,
         "kp_houses": kp_houses,
-        "dasha": dasha_timeline
+        "dasha": dasha_timeline,
+        "np_astrology": {
+            "current_dasha_lord": dasha_lord,
+            "planet_roles": planet_roles,
+            "cuspal_significators": cuspal_significators
+        }
     }
