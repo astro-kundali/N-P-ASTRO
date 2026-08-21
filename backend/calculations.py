@@ -206,19 +206,26 @@ def calculate_vimshottari_dasha(moon_longitude, birth_dt):
         
     return timeline
 
-def calculate_kundali_data(utc_dt, lat, lon):
+def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
     """
     Computes sidereal planetary positions, Placidus house cusps (KP),
     and Rasi chart mapping using Swiss Ephemeris.
     """
-    # 1. Set Sidereal Mode to Lahiri
-    swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
-    
     # Convert UTC datetime to Julian Date
     hour_utc = utc_dt.hour + utc_dt.minute / 60.0 + utc_dt.second / 3600.0
     jd_ut = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day, hour_utc)
     
-    # Calculate Lahiri Ayanamsa offset
+    # 1. Set Sidereal Mode
+    if ayanamsa_system == "newcomb":
+        # Calculate fractional year: Year = 2000.0 + (jd_ut - 2451545.0) / 365.25
+        year_frac = 2000.0 + (jd_ut - 2451545.0) / 365.25
+        # KP Newcomb formula: (Year - 291) * 50.2388475"
+        ayan_val = (year_frac - 291.0) * 50.2388475 / 3600.0
+        swe.set_sid_mode(swe.SIDM_USER, 0.0, ayan_val)
+    else:
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
+        
+    # Calculate Ayanamsa offset
     ayanamsa = swe.get_ayanamsa_ut(jd_ut)
     
     # 2. Calculate Planets (Sun = 0, Moon = 1, Mercury = 2, Venus = 3, Mars = 4, Jupiter = 5, Saturn = 6)

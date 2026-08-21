@@ -29,6 +29,7 @@ class ChartRequest(BaseModel):
     latitude: float
     longitude: float
     timezone_name: str  # e.g. "Asia/Kolkata"
+    ayanamsa_system: str = "lahiri"  # "lahiri" or "newcomb"
 
 @app.get("/health")
 def health_check():
@@ -123,7 +124,7 @@ def get_chart_data(req: ChartRequest):
         
     try:
         # 2. Run calculations
-        chart_result = calculate_kundali_data(utc_dt, req.latitude, req.longitude)
+        chart_result = calculate_kundali_data(utc_dt, req.latitude, req.longitude, req.ayanamsa_system)
         
         # Return results with request echo
         return {
@@ -133,6 +134,7 @@ def get_chart_data(req: ChartRequest):
                 "latitude": req.latitude,
                 "longitude": req.longitude,
                 "timezone_name": req.timezone_name,
+                "ayanamsa_system": req.ayanamsa_system,
                 "utc_time": utc_dt.isoformat()
             },
             "result": chart_result
