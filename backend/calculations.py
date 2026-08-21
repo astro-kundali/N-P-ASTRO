@@ -271,7 +271,7 @@ def calculate_kundali_data(utc_dt, lat, lon):
     # 12 Placidus Cusps
     cusps_data = []
     for i in range(12):
-        cusp_long = cusps[i + 1]  # 1-indexed in cusps
+        cusp_long = cusps[i]  # 0-indexed in pyswisseph (representing houses 1 to 12)
         sidereal_cusp = (cusp_long - ayanamsa) % 360.0
         lords = calculate_lords_hierarchy(sidereal_cusp)
         lords["cusp_number"] = i + 1
