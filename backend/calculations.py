@@ -300,6 +300,41 @@ def calculate_kundali_data(utc_dt, lat, lon):
         rel_house = (p_sign_idx - asc_sign_idx) % 12 + 1
         vedic_houses[rel_house]["planets"].append(p_name)
         
+    # 4b. KP Cuspal House Placement
+    # In KP system, a planet is placed in a house based on whether its longitude
+    # falls between cusp i and cusp i+1.
+    kp_houses = {}
+    for house_num in range(1, 13):
+        cusp = cusps_data[house_num - 1]
+        kp_houses[house_num] = {
+            "sign": cusp["sign"],
+            "sign_lord": cusp["sign_lord"],
+            "planets": []
+        }
+        
+    for p_name, p_val in planets_data.items():
+        p_long = p_val["longitude"]
+        
+        # Determine which house (1 to 12) the planet falls in
+        planet_house = 1 # Fallback
+        for i in range(12):
+            c_start = cusps_data[i]["longitude"]
+            c_end = cusps_data[(i + 1) % 12]["longitude"]
+            
+            is_inside = False
+            if c_start < c_end:
+                if c_start <= p_long < c_end:
+                    is_inside = True
+            else: # Houses crosses 0/360 boundary
+                if p_long >= c_start or p_long < c_end:
+                    is_inside = True
+                    
+            if is_inside:
+                planet_house = i + 1
+                break
+                
+        kp_houses[planet_house]["planets"].append(p_name)
+        
     # 5. Vimshottari Dasha
     moon_long = planets_data["Moon"]["longitude"]
     dasha_timeline = calculate_vimshottari_dasha(moon_long, utc_dt)
@@ -314,5 +349,6 @@ def calculate_kundali_data(utc_dt, lat, lon):
         "planets": planets_data,
         "cusps": cusps_data,
         "vedic_houses": vedic_houses,
+        "kp_houses": kp_houses,
         "dasha": dasha_timeline
     }
