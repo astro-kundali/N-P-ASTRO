@@ -221,7 +221,7 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
         year_frac = 2000.0 + (jd_ut - 2451545.0) / 365.25
         # KP Newcomb formula: (Year - 291) * 50.2388475"
         ayan_val = (year_frac - 291.0) * 50.2388475 / 3600.0
-        swe.set_sid_mode(swe.SIDM_USER, 0.0, ayan_val)
+        swe.set_sid_mode(swe.SIDM_USER, jd_ut, ayan_val)
     else:
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
         
