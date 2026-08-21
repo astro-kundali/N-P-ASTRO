@@ -1,0 +1,605 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-cosmic: 'Cinzel', serif;
+  --font-sans: 'Inter', sans-serif;
+
+  /* Colors */
+  --bg-deep: #05050f;
+  --bg-space: radial-gradient(circle at 50% 50%, #0c0b24 0%, #050510 100%);
+  --gold-primary: #dfb76c;
+  --gold-glowing: #ffd700;
+  --gold-dark: #8e6f30;
+  --violet-glow: rgba(138, 43, 226, 0.4);
+  --cyan-glow: rgba(0, 255, 255, 0.2);
+  
+  --glass-bg: rgba(14, 13, 39, 0.65);
+  --glass-border: rgba(223, 183, 108, 0.18);
+  --glass-border-hover: rgba(223, 183, 108, 0.45);
+  
+  --text-primary: #f0f0f7;
+  --text-muted: #a0a0c0;
+  --text-gold: #e2c185;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-space);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background Stars animation */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 10% 10%, #fff 100%, transparent),
+    radial-gradient(1.5px 1.5px at 20% 40%, #fff 100%, transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(255, 255, 255, 0.8) 100%, transparent),
+    radial-gradient(2px 2px at 60% 70%, #fff 100%, transparent),
+    radial-gradient(1px 1px at 80% 30%, #fff 100%, transparent),
+    radial-gradient(1.5px 1.5px at 90% 85%, rgba(255, 255, 255, 0.9) 100%, transparent);
+  background-size: 550px 550px;
+  opacity: 0.25;
+  animation: backgroundTwinkle 60s linear infinite;
+  z-index: -2;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+@keyframes backgroundTwinkle {
+  from { background-position: 0 0; }
+  to { background-position: 550px 1100px; }
+}
+
+/* App Header & Title Styling */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-cosmic);
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 30%, var(--gold-primary) 70%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px var(--violet-glow);
+  padding: 1.5rem 0;
+}
+
+/* Layout Containers */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem 1.5rem;
+}
+
+.cosmic-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(223, 183, 108, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin-bottom: 2rem;
+}
+
+.cosmic-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 12px 40px 0 rgba(138, 43, 226, 0.15), inset 0 0 20px rgba(223, 183, 108, 0.08);
+}
+
+/* Input Fields */
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.input-group label {
+  font-family: var(--font-cosmic);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input-control {
+  background: rgba(8, 8, 24, 0.8);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  width: 100%;
+}
+
+.input-control:focus {
+  outline: none;
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 10px var(--violet-glow);
+}
+
+/* Geolocation Autocomplete Dropdown */
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 9, 30, 0.95);
+  border: 1px solid var(--gold-primary);
+  border-radius: 8px;
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  list-style: none;
+  margin-top: 4px;
+}
+
+.autocomplete-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.15s ease;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.autocomplete-item:hover {
+  background: rgba(223, 183, 108, 0.15);
+  color: var(--gold-glowing);
+}
+
+/* Gold Button */
+.btn-gold {
+  background: linear-gradient(135deg, #b8860b 0%, #dfb76c 50%, #b8860b 100%);
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  color: #0c0b24;
+  font-family: var(--font-cosmic);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  padding: 0.9rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(223, 183, 108, 0.3);
+  margin-top: 1rem;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #dfb76c 0%, #ffd700 50%, #dfb76c 100%);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-gold:active {
+  transform: translateY(1px);
+}
+
+/* Tabs Navigation */
+.tabs-header {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid rgba(223, 183, 108, 0.2);
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-cosmic);
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  color: var(--gold-primary);
+  border-bottom-color: var(--gold-primary);
+  text-shadow: 0 0 10px rgba(223, 183, 108, 0.4);
+}
+
+/* Two-column results layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 480px 1fr;
+  }
+}
+
+/* Astrological Table styling */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+  margin-top: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.astro-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+  background: rgba(10, 9, 30, 0.4);
+}
+
+.astro-table th, .astro-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.astro-table th {
+  background: rgba(223, 183, 108, 0.08);
+  font-family: var(--font-cosmic);
+  color: var(--gold-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.astro-table tr:hover {
+  background: rgba(223, 183, 108, 0.04);
+}
+
+.astro-table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-gold {
+  color: var(--gold-primary);
+  font-weight: 500;
+}
+
+.text-glowing {
+  color: var(--gold-glowing);
+  font-weight: 600;
+}
+
+.badge-retro {
+  background: #a52a2a;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 5px;
+  display: inline-block;
+}
+
+/* Charts Switcher */
+.chart-type-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(223, 183, 108, 0.2);
+  border-radius: 20px;
+  color: var(--text-muted);
+  padding: 0.4rem 1.2rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chart-toggle-btn.active {
+  background: rgba(223, 183, 108, 0.15);
+  color: var(--gold-primary);
+  border-color: var(--gold-primary);
+}
+
+/* SVG Chart Visualizers */
+.chart-visual-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(5, 5, 15, 0.7);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(223, 183, 108, 0.1);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+  min-height: 380px;
+}
+
+.vedic-chart-svg {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.25));
+}
+
+.chart-line {
+  stroke: var(--gold-primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.chart-text-house {
+  fill: rgba(255, 255, 255, 0.25);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  text-anchor: middle;
+}
+
+.chart-text-sign {
+  fill: var(--gold-primary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  font-weight: bold;
+}
+
+.chart-text-planet {
+  fill: #ffffff;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.9));
+}
+
+/* Vimshottari Dasha styling */
+.dasha-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dasha-row {
+  border: 1px solid rgba(223, 183, 108, 0.15);
+  border-radius: 8px;
+  background: rgba(14, 13, 39, 0.4);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.dasha-row.expanded {
+  border-color: rgba(223, 183, 108, 0.4);
+  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.1);
+}
+
+.dasha-header-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+}
+
+.dasha-header-trigger:hover {
+  background: rgba(223, 183, 108, 0.08);
+}
+
+.dasha-lord-badge {
+  font-family: var(--font-cosmic);
+  font-weight: 700;
+  color: var(--gold-primary);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dasha-date-range {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.dasha-child-container {
+  border-top: 1px solid rgba(223, 183, 108, 0.1);
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background: rgba(5, 5, 15, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dasha-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 0.8rem;
+  color: var(--gold-primary);
+}
+
+.expanded .dasha-arrow {
+  transform: rotate(90deg);
+}
+
+/* Sub-sub accordion levels */
+.dasha-sub-row {
+  border-left: 2px solid rgba(223, 183, 108, 0.25);
+  padding-left: 1rem;
+}
+
+.dasha-sub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.dasha-sub-header:hover {
+  color: var(--gold-glowing);
+}
+
+.dasha-sub-child-container {
+  padding: 0.5rem 0 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.dasha-sub-sub-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  padding: 0.3rem 0;
+  color: var(--text-muted);
+}
+
+.dasha-sub-sub-item:hover {
+  color: var(--text-primary);
+}
+
+/* Loading Spinner & Cosmic Animations */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.cosmic-loader {
+  width: 80px;
+  height: 80px;
+  border: 2px solid transparent;
+  border-top-color: var(--gold-primary);
+  border-bottom-color: var(--gold-primary);
+  border-radius: 50%;
+  animation: cosmicRotate 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  position: relative;
+}
+
+.cosmic-loader::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid transparent;
+  border-left-color: var(--violet-glow);
+  border-right-color: var(--violet-glow);
+  border-radius: 50%;
+  animation: cosmicRotateInverse 1.2s linear infinite;
+}
+
+@keyframes cosmicRotate {
+  0% { transform: rotate(0deg) scale(0.9); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(0.9); }
+}
+
+@keyframes cosmicRotateInverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.loader-text {
+  font-family: var(--font-cosmic);
+  color: var(--gold-primary);
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  animation: textPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes textPulse {
+  from { opacity: 0.4; text-shadow: 0 0 5px rgba(223, 183, 108, 0.1); }
+  to { opacity: 1; text-shadow: 0 0 15px var(--gold-primary); }
+}
+
+/* Info metadata text styling */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  background: rgba(223, 183, 108, 0.05);
+  border: 1px dashed rgba(223, 183, 108, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-family: var(--font-cosmic);
+  font-size: 0.75rem;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.meta-value {
+  font-weight: 500;
+}

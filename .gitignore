@@ -1,0 +1,15 @@
+# Portable Node.js binaries
+bin/
+setup_node.ps1
+
+# Frontend build outputs and node modules
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+
+# Python environment and caches
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+backend/.venv/
+.pytest_cache/
