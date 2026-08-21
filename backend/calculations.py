@@ -237,8 +237,8 @@ def calculate_kundali_data(utc_dt, lat, lon):
     
     for name, swe_id in planet_ids.items():
         res = swe.calc_ut(jd_ut, swe_id, swe.FLG_SWIEPH)
-        tropical_long = res[0]
-        speed = res[3]
+        tropical_long = res[0][0]
+        speed = res[0][3]
         
         # Sidereal longitude
         sidereal_long = (tropical_long - ayanamsa) % 360.0
