@@ -30,6 +30,7 @@ class ChartRequest(BaseModel):
     longitude: float
     timezone_name: str  # e.g. "Asia/Kolkata"
     ayanamsa_system: str = "lahiri"  # "lahiri" or "newcomb"
+    moon_star_lord_override: str = "dasha_lord"
 
 @app.get("/health")
 def health_check():
@@ -126,7 +127,9 @@ def get_chart_data(req: ChartRequest):
         
     try:
         # 2. Run calculations
-        chart_result = calculate_kundali_data(utc_dt, req.latitude, req.longitude, req.ayanamsa_system)
+        chart_result = calculate_kundali_data(
+            utc_dt, req.latitude, req.longitude, req.ayanamsa_system, req.moon_star_lord_override
+        )
         chart_result["timezone_offset"] = tz_offset_hours
         
         # Return results with request echo
@@ -139,6 +142,7 @@ def get_chart_data(req: ChartRequest):
                 "timezone_name": req.timezone_name,
                 "timezone_offset": tz_offset_hours,
                 "ayanamsa_system": req.ayanamsa_system,
+                "moon_star_lord_override": req.moon_star_lord_override,
                 "utc_time": utc_dt.isoformat()
             },
             "result": chart_result

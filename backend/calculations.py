@@ -206,7 +206,7 @@ def calculate_vimshottari_dasha(moon_longitude, birth_dt):
         
     return timeline
 
-def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
+def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri", moon_star_lord_override="dasha_lord"):
     """
     Computes sidereal planetary positions, Placidus house cusps (KP),
     and Rasi chart mapping using Swiss Ephemeris.
@@ -360,6 +360,16 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
         except Exception:
             continue
             
+    # Determine the Moon Star Lord override
+    active_moon_star_lord = dasha_lord
+    if moon_star_lord_override and moon_star_lord_override != "dasha_lord":
+        if moon_star_lord_override in VIMSHOTTARI_LORDS:
+            active_moon_star_lord = moon_star_lord_override
+            
+    # Override Moon's Star Lord in planets_data
+    if "Moon" in planets_data:
+        planets_data["Moon"]["star_lord"] = active_moon_star_lord
+            
     # Planet Roles Table
     # For every planet, collect list of cusp numbers where this planet is the Sub Lord
     planet_roles = {}
@@ -396,9 +406,9 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
     for idx, cusp in enumerate(cusps_data):
         cusp_sub_lord = cusp["sub_lord"]
         
-        # Star Lord (overridden for Moon to be the active dasha_lord)
+        # Star Lord (overridden for Moon to be the active_moon_star_lord)
         if cusp_sub_lord == "Moon":
-            star_lord = dasha_lord
+            star_lord = active_moon_star_lord
         else:
             star_lord = planets_data.get(cusp_sub_lord, {}).get("star_lord", "")
             
