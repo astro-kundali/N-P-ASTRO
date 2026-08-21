@@ -143,3 +143,28 @@ def get_chart_data(req: ChartRequest):
         import traceback
         tb_str = traceback.format_exc()
         raise HTTPException(status_code=500, detail=f"Astrological calculation failure: {str(e)}\nTraceback:\n{tb_str}")
+
+@app.get("/api/test-ayanamsa")
+def test_ayanamsa(year: int, month: int, day: int, hour: float):
+    import swisseph as swe
+    from calculations import format_degrees
+    jd = swe.julday(year, month, day, hour)
+    results = {}
+    
+    # 1. Lahiri
+    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+    results["lahiri"] = swe.get_ayanamsa_ut(jd)
+    results["lahiri_fmt"] = format_degrees(results["lahiri"])
+    
+    # 2. Krishnamurti (constant 5)
+    swe.set_sid_mode(5, 0, 0)
+    results["kp_std"] = swe.get_ayanamsa_ut(jd)
+    results["kp_std_fmt"] = format_degrees(results["kp_std"])
+    
+    # 3. Krishnamurti VP291
+    if hasattr(swe, "SIDM_KRISHNAMURTI_VP291"):
+        swe.set_sid_mode(swe.SIDM_KRISHNAMURTI_VP291, 0, 0)
+        results["kp_vp291"] = swe.get_ayanamsa_ut(jd)
+        results["kp_vp291_fmt"] = format_degrees(results["kp_vp291"])
+        
+    return results
