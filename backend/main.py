@@ -77,6 +77,17 @@ def geocode_address(q: str):
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"Geocoding service error: {str(e)}")
 
+@app.get("/api/timezone")
+def resolve_timezone(lat: float, lon: float):
+    """
+    Looks up the timezone name (e.g. 'Asia/Kolkata') offline for given coordinates.
+    """
+    try:
+        tz_name = tf.timezone_at(lng=lon, lat=lat) or "UTC"
+        return {"timezone_name": tz_name}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Timezone resolution failed: {str(e)}")
+
 @app.post("/api/chart-data")
 def get_chart_data(req: ChartRequest):
     """

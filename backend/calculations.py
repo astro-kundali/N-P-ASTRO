@@ -236,12 +236,9 @@ def calculate_kundali_data(utc_dt, lat, lon):
     planets_data = {}
     
     for name, swe_id in planet_ids.items():
-        res = swe.calc_ut(jd_ut, swe_id, swe.FLG_SWIEPH)
-        tropical_long = res[0][0]
+        res = swe.calc_ut(jd_ut, swe_id, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
+        sidereal_long = res[0][0]
         speed = res[0][3]
-        
-        # Sidereal longitude
-        sidereal_long = (tropical_long - ayanamsa) % 360.0
         
         # Retrogression
         retrograde = "R" if speed < 0 else "D"
@@ -261,18 +258,17 @@ def calculate_kundali_data(utc_dt, lat, lon):
     planets_data["Ketu"] = ketu_lords
     
     # 3. Calculate Placidus Houses (KP Cusps)
-    # Placidus system is 'P'
-    cusps, ascmc = swe.houses_ex(jd_ut, lat, lon, b'P')
+    # Placidus system is 'P', passing FLG_SIDEREAL calculates sidereal directly
+    cusps, ascmc = swe.houses_ex(jd_ut, lat, lon, b'P', swe.FLG_SIDEREAL)
     
     # Ascendant
-    asc_sidereal = (ascmc[0] - ayanamsa) % 360.0
+    asc_sidereal = ascmc[0]
     asc_lords = calculate_lords_hierarchy(asc_sidereal)
     
     # 12 Placidus Cusps
     cusps_data = []
     for i in range(12):
-        cusp_long = cusps[i]  # 0-indexed in pyswisseph (representing houses 1 to 12)
-        sidereal_cusp = (cusp_long - ayanamsa) % 360.0
+        sidereal_cusp = cusps[i]  # 0-indexed in pyswisseph (representing houses 1 to 12)
         lords = calculate_lords_hierarchy(sidereal_cusp)
         lords["cusp_number"] = i + 1
         cusps_data.append(lords)
