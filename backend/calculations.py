@@ -217,11 +217,13 @@ def calculate_kundali_data(utc_dt, lat, lon, ayanamsa_system="lahiri"):
     
     # 1. Set Sidereal Mode
     if ayanamsa_system == "newcomb":
-        # Calculate fractional year: Year = 2000.0 + (jd_ut - 2451545.0) / 365.25
-        year_frac = 2000.0 + (jd_ut - 2451545.0) / 365.25
-        # KP Newcomb formula: (Year - 291) * 50.2388475"
-        ayan_val = (year_frac - 291.0) * 50.2388475 / 3600.0
-        swe.set_sid_mode(swe.SIDM_USER, jd_ut, ayan_val)
+        # In Swiss Ephemeris, SIDM_KRISHNAMURTI_VP291 represents the "KP New" (Senthilathiban) Ayanamsha system
+        # which yields exactly 24° 08' 18" for 2026.
+        if hasattr(swe, "SIDM_KRISHNAMURTI_VP291"):
+            swe.set_sid_mode(swe.SIDM_KRISHNAMURTI_VP291, 0.0, 0.0)
+        else:
+            # Fallback to standard Krishnamurti (SIDM_KRISHNAMURTI = 5)
+            swe.set_sid_mode(5, 0.0, 0.0)
     else:
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
         
